@@ -18,3 +18,5 @@ WindowsService1/service/WindowsService1.vshost.exe.manifest
 notifier/TrayApp.vshost.exe
 notifier/TrayApp.vshost.exe.config
 notifier/TrayApp.vshost.exe.manifest
+TrayApp/obj/
+*.log
