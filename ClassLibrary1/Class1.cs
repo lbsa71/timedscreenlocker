@@ -138,13 +138,13 @@
 
             this.SetText(message);
 
-            if (this.secondsLeftOn == 0) this.SwitchOff();
+            if (this.secondsLeftOn <= 0) this.SwitchOff();
         }
 
         public abstract bool CheckOn { get; }
 
         [DllImport("user32.dll")]
-        public static extern bool LockWorkStation();
+        protected static extern bool LockWorkStation();
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern int SystemParametersInfo(int uAction, int uParam, ref int lpvParam, int fuWinIni);

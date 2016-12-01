@@ -23,7 +23,8 @@ namespace WindowsService1
 
         protected override void SwitchOff()
         {
-          LockWorkStation();
+            this.Log("Switching off.");
+            LockWorkStation();
         }
 
         public void ScreenTurnedOn()
