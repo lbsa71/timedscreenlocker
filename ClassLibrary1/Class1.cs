@@ -36,7 +36,7 @@
         {
             var currentDomainBaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
-            var logFile = currentDomainBaseDirectory + "service.log";
+            var logFile = currentDomainBaseDirectory + "service2.log";
 
             using (var fs = new FileStream(logFile, FileMode.Append))
             {
@@ -44,7 +44,10 @@
                 {
                     logStream.WriteLine(message);
                     logStream.Flush();
+                    logStream.Close();
                 }
+
+                fs.Close();
             }
 
             Console.WriteLine(message);

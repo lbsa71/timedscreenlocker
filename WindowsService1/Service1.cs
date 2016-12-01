@@ -25,45 +25,45 @@ namespace WindowsService1
 
        
 
-            this.Log("Service constructed.");
+            this.serviceClass1.Log("Service constructed.");
         }
 
         protected override void OnStart(string[] args)
         {
-            this.Log("Service OnStart.");
+            this.serviceClass1.Log("Service OnStart.");
             this.serviceClass1.Start();
         }
 
         protected override void OnStop()
         {
-            this.Log("Service OnStop.");
+            this.serviceClass1.Log("Service OnStop.");
             this.serviceClass1.Stop();
         }
 
         protected override void OnContinue()
         {
-            this.Log("Service OnContinue.");
+            this.serviceClass1.Log("Service OnContinue.");
             base.OnContinue();
             this.serviceClass1.Start();
         }
 
         protected override void OnPause()
         {
-            this.Log("Service OnPause.");
+            this.serviceClass1.Log("Service OnPause.");
             base.OnPause();
             this.serviceClass1.Stop();
         }
 
         protected override void OnShutdown()
         {
-            this.Log("Service OnShutdown.");
+            this.serviceClass1.Log("Service OnShutdown.");
             base.OnShutdown();
             this.serviceClass1.Stop();
         }
 
         protected override void OnSessionChange(SessionChangeDescription changeDescription)
         {
-            this.Log("Service OnSessionChange:" + changeDescription.Reason);
+            this.serviceClass1.Log("Service OnSessionChange:" + changeDescription.Reason);
 
             switch (changeDescription.Reason)
             {
