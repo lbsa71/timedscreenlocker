@@ -1,0 +1,16 @@
+ClassLibrary1/bin/
+ClassLibrary1/obj/
+ConsoleApplication1/bin/
+ConsoleApplication1/obj/
+*.pdb
+ConsoleApplication1/tester/$RANDOM_SEED$
+ConsoleApplication1/tester/ConsoleApplication1.vshost.exe
+ConsoleApplication1/tester/ConsoleApplication1.vshost.exe.config
+ConsoleApplication1/tester/ConsoleApplication1.vshost.exe.manifest
+*.cache
+WindowsService1/obj/
+WindowsService1/bin/
+WindowsService1/service/$RANDOM_SEED$
+WindowsService1/service/WindowsService1.vshost.exe
+WindowsService1/service/WindowsService1.vshost.exe.config
+WindowsService1/service/WindowsService1.vshost.exe.manifest
