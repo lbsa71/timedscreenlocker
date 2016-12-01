@@ -37,7 +37,14 @@
 
             // The Icon property sets the icon that will appear
             // in the systray for this application.
-            this.notifyIcon1.Icon = new Icon("appicon.ico");
+
+            var appiconIco = "appicon.ico";
+
+            var appIconPath = AppDomain.CurrentDomain.BaseDirectory + appiconIco;
+
+            Console.WriteLine(appIconPath);
+
+            this.notifyIcon1.Icon = new Icon(appIconPath);
 
             // The ContextMenu property sets the menu that will
             // appear when the systray icon is right clicked.
