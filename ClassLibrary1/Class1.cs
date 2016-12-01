@@ -3,6 +3,7 @@
     using System;
     using System.Configuration;
     using System.Drawing;
+    using System.IO;
     using System.Runtime.InteropServices;
     using System.Timers;
     using System.Windows.Forms;
@@ -35,6 +36,19 @@
 
         public Class1()
         {
+            var currentDomainBaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            var logFile = currentDomainBaseDirectory + "service.log";
+
+            var fs = new FileStream(logFile, FileMode.Create);
+            
+
+            var sw = new StreamWriter(fs);
+            sw.AutoFlush = true;
+
+
+
+            Console.SetOut(sw);
             // Create the NotifyIcon.
             this.notifyIcon1 = new NotifyIcon();
 
@@ -43,7 +57,7 @@
 
             var appiconIco = "appicon.ico";
 
-            var appIconPath = AppDomain.CurrentDomain.BaseDirectory + appiconIco;
+            var appIconPath = currentDomainBaseDirectory + appiconIco;
 
             Console.WriteLine(appIconPath);
 
@@ -74,6 +88,8 @@
             this.timer1.Elapsed += this.Check;
 
             Console.WriteLine("System initialized: secondsOff:" + this.secondsOff + " secondsOn:" + this.secondsOn + " pollingInterval:" + this.pollingInterval);
+
+            
         }
 
         private void Check(object sender, ElapsedEventArgs e)

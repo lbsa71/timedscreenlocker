@@ -23,12 +23,7 @@ namespace WindowsService1
 
             this.serviceClass1 = new ServiceClass1();
 
-            var logFile = AppDomain.CurrentDomain.BaseDirectory + "service.log";
-
-            var writer = new StreamWriter(logFile);
-
-            
-            Console.SetOut(writer);
+       
 
             Console.WriteLine("Service constructed.");
         }
