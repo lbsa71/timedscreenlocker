@@ -4,11 +4,12 @@
     using System.Configuration;
     using System.Drawing;
     using System.Runtime.InteropServices;
+    using System.Timers;
     using System.Windows.Forms;
 
     using Microsoft.Win32;
 
-    using Timer = System.Threading.Timer;
+    using Timer = System.Timers.Timer;
 
     public abstract class Class1
     {
@@ -67,18 +68,11 @@
             this.secondsLeftOff = this.secondsOff;
             this.secondsLeftOn = this.secondsOn;
 
-            this.timer1 = new Timer(this.Check);
+            this.timer1 = new Timer(this.pollingInterval * 1000);
+            this.timer1.Elapsed += this.Check;
         }
 
-        public abstract bool CheckOn { get; }
-
-        [DllImport("user32.dll")]
-        public static extern bool LockWorkStation();
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern int SystemParametersInfo(int uAction, int uParam, ref int lpvParam, int fuWinIni);
-
-        public void Check(object state)
+        private void Check(object sender, ElapsedEventArgs e)
         {
             var now = DateTime.Now;
 
@@ -118,6 +112,14 @@
             if (this.secondsLeftOn == 0) this.SwitchOff();
         }
 
+        public abstract bool CheckOn { get; }
+
+        [DllImport("user32.dll")]
+        public static extern bool LockWorkStation();
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern int SystemParametersInfo(int uAction, int uParam, ref int lpvParam, int fuWinIni);
+
         protected virtual void SetText(string text)
         {
             this.notifyIcon1.Text = text;
@@ -125,12 +127,12 @@
 
         public void Start()
         {            
-            this.timer1.Change(0, this.pollingInterval * 1000);
+            this.timer1.Start();
         }
 
         public void Stop()
         {
-            this.timer1.Change(TimeSpan.MaxValue, TimeSpan.MaxValue);
+            this.timer1.Stop();
         }
 
         protected abstract void SwitchOff();

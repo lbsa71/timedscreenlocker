@@ -39,7 +39,9 @@
             // 
             // serviceInstaller1
             // 
-            this.serviceInstaller1.ServiceName = "Service1";
+            this.serviceInstaller1.Description = "Timed Screen Locker";
+            this.serviceInstaller1.DisplayName = "Timed Screen Locker";
+            this.serviceInstaller1.ServiceName = "Service2";
             // 
             // ProjectInstaller
             // 

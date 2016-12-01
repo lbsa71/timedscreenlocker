@@ -31,7 +31,11 @@
             // 
             // Service1
             // 
-            this.ServiceName = "Service1";
+            this.CanHandlePowerEvent = true;
+            this.CanHandleSessionChangeEvent = true;
+            this.CanPauseAndContinue = true;
+            this.CanShutdown = true;
+            this.ServiceName = "TimedScreenLockerService";
 
         }
 

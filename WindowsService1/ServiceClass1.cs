@@ -12,17 +12,28 @@ namespace WindowsService1
     using ClassLibrary1;
     class ServiceClass1 : Class1
     {
+        private bool screenOn = true;
       
         public override bool CheckOn {
             get
             {
-                return !this.ScreenSaverRunning;
+                return this.screenOn;
             }
         }
 
         protected override void SwitchOff()
         {
           LockWorkStation();
+        }
+
+        public void ScreenTurnedOn()
+        {
+            this.screenOn = true;
+        }
+
+        public void ScreenTurnedOff()
+        {
+            this.screenOn = false;
         }
     }
 }
