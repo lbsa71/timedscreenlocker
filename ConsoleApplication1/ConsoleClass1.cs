@@ -27,7 +27,7 @@
         {
             this.Log("Locking Screen.");
 
-            // LockWorkStation();
+            LockWorkStation();
         }
     }
 }

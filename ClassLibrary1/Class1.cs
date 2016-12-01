@@ -18,40 +18,19 @@
 
         public bool ScreenSaverRunning;
 
-        private double secondsOff;
-
-        private double secondsOn;
-
         private readonly NotifyIcon notifyIcon1;
+
+        private readonly int pollingInterval;
 
         private double secondsLeftOff;
 
         private double secondsLeftOn;
 
-        private Timer timer1;
+        private readonly double secondsOff;
 
-        private int pollingInterval;
-        
-        public void Log(string message)
-        {
-            var currentDomainBaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        private readonly double secondsOn;
 
-            var logFile = currentDomainBaseDirectory + "service2.log";
-
-            using (var fs = new FileStream(logFile, FileMode.Append))
-            {
-                using (var logStream = new StreamWriter(fs) { AutoFlush = false })
-                {
-                    logStream.WriteLine(message);
-                    logStream.Flush();
-                    logStream.Close();
-                }
-
-                fs.Close();
-            }
-
-            Console.WriteLine(message);
-        }
+        private readonly Timer timer1;
 
         public Class1()
         {
@@ -64,12 +43,10 @@
 
             // The Icon property sets the icon that will appear
             // in the systray for this application.
-
             var appiconIco = "appicon.ico";
 
             var appIconPath = currentDomainBaseDirectory + appiconIco;
 
-           
             this.notifyIcon1.Icon = new Icon(appIconPath);
 
             // The ContextMenu property sets the menu that will
@@ -96,8 +73,66 @@
             this.timer1 = new Timer(this.pollingInterval * 1000);
             this.timer1.Elapsed += this.Check;
 
-            this.Log("System initialized: secondsOff:" + this.secondsOff + " secondsOn:" + this.secondsOn + " pollingInterval:" + this.pollingInterval);
+            this.Log(
+                "System initialized: secondsOff:" + this.secondsOff + " secondsOn:" + this.secondsOn
+                + " pollingInterval:" + this.pollingInterval);
         }
+
+        public abstract bool CheckOn { get; }
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        public static extern int SystemParametersInfo(int uAction, int uParam, ref int lpvParam, int fuWinIni);
+
+        public void Log(string message)
+        {
+            var currentDomainBaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            var logFile = currentDomainBaseDirectory + "service2.log";
+
+            using (var fs = new FileStream(logFile, FileMode.Append))
+            {
+                using (var logStream = new StreamWriter(fs) { AutoFlush = false })
+                {
+                    logStream.WriteLine(message);
+                    logStream.Flush();
+                    logStream.Close();
+                }
+
+                fs.Close();
+            }
+
+            Console.WriteLine(message);
+        }
+
+        public void Start()
+        {
+            this.Log("Timer Start");
+            this.timer1.Start();
+        }
+
+        public void Stop()
+        {
+            this.Log("Timer Stop");
+            this.timer1.Stop();
+        }
+
+        [DllImport("user32.dll")]
+        protected static extern bool LockWorkStation();
+
+        protected virtual void SetText(string text)
+        {
+            this.Log("SetText: " + text);
+
+            this.notifyIcon1.Text = text;
+        }
+
+        protected abstract void SwitchOff();
+
+        [DllImport("wtsapi32.dll")]
+        private static extern bool WTSRegisterSessionNotification(IntPtr hWnd, int dwFlags);
+
+        [DllImport("wtsapi32.dll")]
+        private static extern bool WTSUnRegisterSessionNotification(IntPtr hWnd);
 
         private void Check(object sender, ElapsedEventArgs e)
         {
@@ -140,41 +175,6 @@
 
             if (this.secondsLeftOn <= 0) this.SwitchOff();
         }
-
-        public abstract bool CheckOn { get; }
-
-        [DllImport("user32.dll")]
-        protected static extern bool LockWorkStation();
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern int SystemParametersInfo(int uAction, int uParam, ref int lpvParam, int fuWinIni);
-
-        protected virtual void SetText(string text)
-        {
-            this.Log("SetText: " + text);
-
-            this.notifyIcon1.Text = text;
-        }
-
-        public void Start()
-        {
-            this.Log("Timer Start");
-            this.timer1.Start();
-        }
-
-        public void Stop()
-        {
-            this.Log("Timer Stop");
-            this.timer1.Stop();
-        }
-
-        protected abstract void SwitchOff();
-
-        [DllImport("wtsapi32.dll")]
-        private static extern bool WTSRegisterSessionNotification(IntPtr hWnd, int dwFlags);
-
-        [DllImport("wtsapi32.dll")]
-        private static extern bool WTSUnRegisterSessionNotification(IntPtr hWnd);
 
         private void SystemEvents_SessionSwitch(object sender, SessionSwitchEventArgs e)
         {

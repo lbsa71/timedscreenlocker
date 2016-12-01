@@ -15,3 +15,6 @@ WindowsService1/service/WindowsService1.vshost.exe
 WindowsService1/service/WindowsService1.vshost.exe.config
 WindowsService1/service/WindowsService1.vshost.exe.manifest
 *.suo
+notifier/TrayApp.vshost.exe
+notifier/TrayApp.vshost.exe.config
+notifier/TrayApp.vshost.exe.manifest
