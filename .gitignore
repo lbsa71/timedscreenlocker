@@ -14,3 +14,4 @@ WindowsService1/service/$RANDOM_SEED$
 WindowsService1/service/WindowsService1.vshost.exe
 WindowsService1/service/WindowsService1.vshost.exe.config
 WindowsService1/service/WindowsService1.vshost.exe.manifest
+*.suo
