@@ -12,7 +12,7 @@
             {
                 var screenOn = !this.ScreenSaverRunning;
 
-                Console.WriteLine("State on:" + screenOn);
+                this.Log("State on:" + screenOn);
 
                 return screenOn;
             }
@@ -20,12 +20,12 @@
 
         protected override void SetText(string text)
         {
-            Console.WriteLine(text);
+            this.Log(text);
         }
 
         protected override void SwitchOff()
         {
-            Console.WriteLine("Locking Screen.");
+            this.Log("Locking Screen.");
 
             // LockWorkStation();
         }

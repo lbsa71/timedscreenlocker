@@ -31,24 +31,31 @@
         private Timer timer1;
 
         private int pollingInterval;
-
         
-
-        public Class1()
+        public void Log(string message)
         {
             var currentDomainBaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
             var logFile = currentDomainBaseDirectory + "service.log";
 
-            var fs = new FileStream(logFile, FileMode.Create);
-            
+            using (var fs = new FileStream(logFile, FileMode.Append))
+            {
+                using (var logStream = new StreamWriter(fs) { AutoFlush = false })
+                {
+                    logStream.WriteLine(message);
+                    logStream.Flush();
+                }
+            }
 
-            var sw = new StreamWriter(fs);
-            sw.AutoFlush = true;
+            Console.WriteLine(message);
+        }
 
+        public Class1()
+        {
+            var currentDomainBaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
+            this.Log(currentDomainBaseDirectory);
 
-            Console.SetOut(sw);
             // Create the NotifyIcon.
             this.notifyIcon1 = new NotifyIcon();
 
@@ -59,8 +66,7 @@
 
             var appIconPath = currentDomainBaseDirectory + appiconIco;
 
-            Console.WriteLine(appIconPath);
-
+           
             this.notifyIcon1.Icon = new Icon(appIconPath);
 
             // The ContextMenu property sets the menu that will
@@ -87,9 +93,7 @@
             this.timer1 = new Timer(this.pollingInterval * 1000);
             this.timer1.Elapsed += this.Check;
 
-            Console.WriteLine("System initialized: secondsOff:" + this.secondsOff + " secondsOn:" + this.secondsOn + " pollingInterval:" + this.pollingInterval);
-
-            
+            this.Log("System initialized: secondsOff:" + this.secondsOff + " secondsOn:" + this.secondsOn + " pollingInterval:" + this.pollingInterval);
         }
 
         private void Check(object sender, ElapsedEventArgs e)
@@ -99,7 +103,7 @@
             var secondssince = (now - this.lastChecked).TotalSeconds;
             this.lastChecked = now;
 
-            Console.WriteLine(now + ": Time since last check:" + secondssince);
+            this.Log(now + ": Time since last check:" + secondssince);
 
             if (this.CheckOn && (this.secondsLeftOn > 0))
             {
@@ -144,20 +148,20 @@
 
         protected virtual void SetText(string text)
         {
-            Console.WriteLine("SetText: " + text);
+            this.Log("SetText: " + text);
 
             this.notifyIcon1.Text = text;
         }
 
         public void Start()
         {
-            Console.WriteLine("Timer Start");
+            this.Log("Timer Start");
             this.timer1.Start();
         }
 
         public void Stop()
         {
-            Console.WriteLine("Timer Stop");
+            this.Log("Timer Stop");
             this.timer1.Stop();
         }
 
@@ -171,7 +175,7 @@
 
         private void SystemEvents_SessionSwitch(object sender, SessionSwitchEventArgs e)
         {
-            Console.WriteLine("SystemEvents_SessionSwitch:" + e.Reason);
+            this.Log("SystemEvents_SessionSwitch:" + e.Reason);
 
             if (e.Reason == SessionSwitchReason.SessionLock) this.ScreenSaverRunning = true;
             else if (e.Reason == SessionSwitchReason.SessionUnlock) this.ScreenSaverRunning = false;
