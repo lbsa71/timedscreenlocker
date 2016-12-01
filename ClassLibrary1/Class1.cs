@@ -31,6 +31,8 @@
 
         private int pollingInterval;
 
+        
+
         public Class1()
         {
             // Create the NotifyIcon.
@@ -70,6 +72,8 @@
 
             this.timer1 = new Timer(this.pollingInterval * 1000);
             this.timer1.Elapsed += this.Check;
+
+            Console.WriteLine("System initialized: secondsOff:" + this.secondsOff + " secondsOn:" + this.secondsOn + " pollingInterval:" + this.pollingInterval);
         }
 
         private void Check(object sender, ElapsedEventArgs e)
@@ -78,6 +82,8 @@
 
             var secondssince = (now - this.lastChecked).TotalSeconds;
             this.lastChecked = now;
+
+            Console.WriteLine(now + ": Time since last check:" + secondssince);
 
             if (this.CheckOn && (this.secondsLeftOn > 0))
             {
@@ -122,16 +128,20 @@
 
         protected virtual void SetText(string text)
         {
+            Console.WriteLine("SetText: " + text);
+
             this.notifyIcon1.Text = text;
         }
 
         public void Start()
-        {            
+        {
+            Console.WriteLine("Timer Start");
             this.timer1.Start();
         }
 
         public void Stop()
         {
+            Console.WriteLine("Timer Stop");
             this.timer1.Stop();
         }
 
@@ -145,6 +155,8 @@
 
         private void SystemEvents_SessionSwitch(object sender, SessionSwitchEventArgs e)
         {
+            Console.WriteLine("SystemEvents_SessionSwitch:" + e.Reason);
+
             if (e.Reason == SessionSwitchReason.SessionLock) this.ScreenSaverRunning = true;
             else if (e.Reason == SessionSwitchReason.SessionUnlock) this.ScreenSaverRunning = false;
         }
