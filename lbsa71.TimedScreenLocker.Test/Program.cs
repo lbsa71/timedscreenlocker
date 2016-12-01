@@ -1,10 +1,10 @@
-﻿namespace ConsoleApplication1
+﻿namespace lbsa71.TimedScreenLocker.Test
 {
     internal class Program
     {
         private static void Main(string[] args)
         {
-            var app = new ConsoleClass1();
+            var app = new TestEngine();
 
             app.Start();
 

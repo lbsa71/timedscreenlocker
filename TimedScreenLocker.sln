@@ -3,13 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsService1", "WindowsService1\WindowsService1.csproj", "{CB0F6135-CB21-4AE4-8A8E-CAC0182EBA8D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lbsa71.TimedScreenLocker.Core", "lbsa71.TimedScreenLocker.Core\lbsa71.TimedScreenLocker.Core.csproj", "{A91E8E1A-8835-434E-9416-C985F261AC8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApplication1", "ConsoleApplication1\ConsoleApplication1.csproj", "{925BD92A-0EFC-46BD-BA12-8B1AEB8865FE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lbsa71.TimedScreenLocker.TrayApp", "lbsa71.TimedScreenLocker.TrayApp\lbsa71.TimedScreenLocker.TrayApp.csproj", "{422665C6-4054-4B17-9F5E-88B0B251A568}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassLibrary1", "ClassLibrary1\ClassLibrary1.csproj", "{A91E8E1A-8835-434E-9416-C985F261AC8A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrayApp", "TrayApp\TrayApp.csproj", "{422665C6-4054-4B17-9F5E-88B0B251A568}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lbsa71.TimedScreenLocker.Test", "lbsa71.TimedScreenLocker.Test\lbsa71.TimedScreenLocker.Test.csproj", "{925BD92A-0EFC-46BD-BA12-8B1AEB8865FE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,14 +15,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{CB0F6135-CB21-4AE4-8A8E-CAC0182EBA8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CB0F6135-CB21-4AE4-8A8E-CAC0182EBA8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CB0F6135-CB21-4AE4-8A8E-CAC0182EBA8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CB0F6135-CB21-4AE4-8A8E-CAC0182EBA8D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{925BD92A-0EFC-46BD-BA12-8B1AEB8865FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{925BD92A-0EFC-46BD-BA12-8B1AEB8865FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{925BD92A-0EFC-46BD-BA12-8B1AEB8865FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{925BD92A-0EFC-46BD-BA12-8B1AEB8865FE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A91E8E1A-8835-434E-9416-C985F261AC8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A91E8E1A-8835-434E-9416-C985F261AC8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A91E8E1A-8835-434E-9416-C985F261AC8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,6 +23,10 @@ Global
 		{422665C6-4054-4B17-9F5E-88B0B251A568}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{422665C6-4054-4B17-9F5E-88B0B251A568}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{422665C6-4054-4B17-9F5E-88B0B251A568}.Release|Any CPU.Build.0 = Release|Any CPU
+		{925BD92A-0EFC-46BD-BA12-8B1AEB8865FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{925BD92A-0EFC-46BD-BA12-8B1AEB8865FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{925BD92A-0EFC-46BD-BA12-8B1AEB8865FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{925BD92A-0EFC-46BD-BA12-8B1AEB8865FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

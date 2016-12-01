@@ -7,8 +7,8 @@
     <ProjectGuid>{925BD92A-0EFC-46BD-BA12-8B1AEB8865FE}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ConsoleApplication1</RootNamespace>
-    <AssemblyName>ConsoleApplication1</AssemblyName>
+    <RootNamespace>lbsa71.TimedScreenLocker.Test</RootNamespace>
+    <AssemblyName>lbsa71.TimedScreenLocker.Test</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -43,7 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConsoleClass1.cs" />
+    <Compile Include="TestEngine.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -51,9 +51,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ClassLibrary1\ClassLibrary1.csproj">
+    <ProjectReference Include="..\lbsa71.TimedScreenLocker.Core\lbsa71.TimedScreenLocker.Core.csproj">
       <Project>{a91e8e1a-8835-434e-9416-c985f261ac8a}</Project>
-      <Name>ClassLibrary1</Name>
+      <Name>lbsa71.TimedScreenLocker.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

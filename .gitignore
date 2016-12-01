@@ -20,3 +20,11 @@ notifier/TrayApp.vshost.exe.config
 notifier/TrayApp.vshost.exe.manifest
 TrayApp/obj/
 *.log
+lbsa71.TimedScreenLocker.Core/bin/
+lbsa71.TimedScreenLocker.Core/obj/
+lbsa71.TimedScreenLocker.Test/obj/
+lbsa71.TimedScreenLocker.Test/tester/$RANDOM_SEED$
+lbsa71.TimedScreenLocker.Test/tester/ConsoleApplication1.vshost.exe
+lbsa71.TimedScreenLocker.Test/tester/ConsoleApplication1.vshost.exe.config
+lbsa71.TimedScreenLocker.Test/tester/ConsoleApplication1.vshost.exe.manifest
+lbsa71.TimedScreenLocker.TrayApp/obj/

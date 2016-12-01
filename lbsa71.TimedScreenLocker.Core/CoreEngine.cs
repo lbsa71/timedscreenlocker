@@ -1,4 +1,4 @@
-﻿namespace ClassLibrary1
+﻿namespace lbsa71.TimedScreenLocker.Core
 {
     using System;
     using System.Configuration;
@@ -12,7 +12,7 @@
 
     using Timer = System.Timers.Timer;
 
-    public abstract class Class1
+    public abstract class CoreEngine
     {
         public DateTime lastChecked;
 
@@ -32,7 +32,7 @@
 
         private readonly Timer timer1;
 
-        public Class1()
+        public CoreEngine()
         {
             var currentDomainBaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 

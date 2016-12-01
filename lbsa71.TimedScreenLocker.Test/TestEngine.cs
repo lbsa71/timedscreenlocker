@@ -1,10 +1,8 @@
-﻿namespace ConsoleApplication1
+﻿namespace lbsa71.TimedScreenLocker.Test
 {
-    using System;
+    using lbsa71.TimedScreenLocker.Core;
 
-    using ClassLibrary1;
-
-    internal class ConsoleClass1 : Class1
+    internal class TestEngine : CoreEngine
     {
         public override bool CheckOn
         {

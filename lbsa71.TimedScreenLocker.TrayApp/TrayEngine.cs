@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TrayApp
+﻿namespace lbsa71.TimedScreenLocker.TrayApp
 {
-    using ClassLibrary1;
+    using lbsa71.TimedScreenLocker.Core;
 
-    public class TrayNotification : Class1
+    public class TrayEngine : CoreEngine
     {
         public override bool CheckOn
         {
