@@ -12,6 +12,8 @@
             }
         }
 
+        protected override string otherProcessExeFileName => "Tuck.exe";
+
         protected override void SwitchOff()
         {
             this.Log("Locking Screen.");

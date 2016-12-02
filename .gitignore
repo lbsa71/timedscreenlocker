@@ -13,3 +13,7 @@ lbsa71.TimedScreenLocker.TrayApp/obj/
 notifier/$RANDOM_SEED$
 notifier/TrayApp.vshost.exe
 notifier/TrayApp.vshost.exe.manifest
+lbsa71.TimedScreenLocker.Tuck/obj/
+notifier/Tuck.vshost.exe
+notifier/Tuck.vshost.exe.config
+notifier/Tuck.vshost.exe.manifest

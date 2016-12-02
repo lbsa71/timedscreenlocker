@@ -3,7 +3,6 @@
     using System;
     using System.Configuration;
     using System.Drawing;
-    using System.IO;
     using System.Runtime.InteropServices;
     using System.Timers;
     using System.Windows.Forms;
@@ -12,9 +11,9 @@
 
     using Timer = System.Timers.Timer;
 
-    public abstract class CoreEngine
+    public abstract class CoreEngine : TimedAppLauncher
     {
-        public DateTime lastChecked;
+        protected Timer screenCheckTimer;
 
         public bool ScreenSaverRunning;
 
@@ -22,22 +21,18 @@
 
         private readonly int pollingInterval;
 
-        private double secondsLeftOff;
-
-        private double secondsLeftOn;
-
         private readonly double secondsOff;
 
         private readonly double secondsOn;
 
-        private readonly Timer timer1;
+        private DateTime lastChecked;
+
+        private double secondsLeftOff;
+
+        private double secondsLeftOn;
 
         public CoreEngine()
         {
-            var currentDomainBaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-
-            this.Log(currentDomainBaseDirectory);
-
             // Create the NotifyIcon.
             this.notifyIcon1 = new NotifyIcon();
 
@@ -45,7 +40,7 @@
             // in the systray for this application.
             var appiconIco = "appicon.ico";
 
-            var appIconPath = currentDomainBaseDirectory + appiconIco;
+            var appIconPath = this.baseDirectory + appiconIco;
 
             this.notifyIcon1.Icon = new Icon(appIconPath);
 
@@ -70,8 +65,8 @@
             this.secondsLeftOff = this.secondsOff;
             this.secondsLeftOn = this.secondsOn;
 
-            this.timer1 = new Timer(this.pollingInterval * 1000);
-            this.timer1.Elapsed += this.Check;
+            this.screenCheckTimer = new Timer(this.pollingInterval * 1000);
+            this.screenCheckTimer.Elapsed += this.Check;
 
             this.Log(
                 "System initialized: secondsOff:" + this.secondsOff + " secondsOn:" + this.secondsOn
@@ -83,37 +78,20 @@
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern int SystemParametersInfo(int uAction, int uParam, ref int lpvParam, int fuWinIni);
 
-        public void Log(string message)
-        {
-            var currentDomainBaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-
-            var logFile = currentDomainBaseDirectory + "service2.log";
-
-            using (var fs = new FileStream(logFile, FileMode.Append))
-            {
-                using (var logStream = new StreamWriter(fs) { AutoFlush = false })
-                {
-                    logStream.WriteLine(message);
-                    logStream.Flush();
-                    logStream.Close();
-                }
-
-                fs.Close();
-            }
-
-            Console.WriteLine(message);
-        }
-
-        public void Start()
+        override public void Start()
         {
             this.Log("Timer Start");
-            this.timer1.Start();
+            this.screenCheckTimer.Start();
+
+            base.Start();
         }
 
-        public void Stop()
+        override public void Stop()
         {
             this.Log("Timer Stop");
-            this.timer1.Stop();
+            this.screenCheckTimer.Stop();
+
+            base.Stop();
         }
 
         [DllImport("user32.dll")]
@@ -143,17 +121,21 @@
 
             this.Log(now + ": Time since last check:" + secondssince);
 
+            var checkOn = this.CheckOn;
+
             if (secondssince > (this.pollingInterval * 4))
             {
                 this.Log("Lost conciousness for " + secondssince + " seconds.");
 
                 // For some reason, we have been unconcious for a while; treat this as being off.
-                DeductTimeOff(secondssince);
+                this.DeductTimeOff(secondssince);
             }
             else
             {
-                if (this.CheckOn && (this.secondsLeftOn > 0))
+                if (checkOn && (this.secondsLeftOn > 0))
                 {
+                    this.Log("Screen on; deducting " + secondssince + " seconds from screen on.");
+
                     this.secondsLeftOn -= secondssince;
 
                     if (this.secondsLeftOn <= 0)
@@ -162,12 +144,10 @@
                         this.secondsLeftOff = this.secondsOff;
                     }
                 }
-                else
+
+                if (!checkOn)
                 {
-                    if (!this.CheckOn)
-                    {
-                        DeductTimeOff(secondssince);
-                    }
+                    this.DeductTimeOff(secondssince);
                 }
             }
 
@@ -177,11 +157,16 @@
 
             this.SetText(message);
 
-            if (this.secondsLeftOn <= 0) this.SwitchOff();
+            if (this.secondsLeftOn <= 0)
+            {
+                this.SwitchOff();
+            }
         }
 
         private void DeductTimeOff(double secondssince)
         {
+            this.Log("Screen off; deducting " + secondssince + " seconds from secondsoff.");
+
             this.secondsLeftOff -= secondssince;
 
             if (this.secondsLeftOff <= 0)
@@ -197,7 +182,7 @@
 
             if (e.Reason == SessionSwitchReason.SessionLock)
             {
-                this.ScreenSaverRunning = true;                
+                this.ScreenSaverRunning = true;
             }
             else if (e.Reason == SessionSwitchReason.SessionUnlock)
             {

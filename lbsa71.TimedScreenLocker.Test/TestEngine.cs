@@ -16,6 +16,8 @@
             }
         }
 
+        protected override string otherProcessExeFileName => null;
+
         protected override void SetText(string text)
         {
             this.Log(text);

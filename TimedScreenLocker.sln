@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lbsa71.TimedScreenLocker.Tr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lbsa71.TimedScreenLocker.Test", "lbsa71.TimedScreenLocker.Test\lbsa71.TimedScreenLocker.Test.csproj", "{925BD92A-0EFC-46BD-BA12-8B1AEB8865FE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lbsa71.TimedScreenLocker.Tuck", "lbsa71.TimedScreenLocker.Tuck\lbsa71.TimedScreenLocker.Tuck.csproj", "{2CE9E005-4151-4567-B2CA-B24F46E3B715}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{925BD92A-0EFC-46BD-BA12-8B1AEB8865FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{925BD92A-0EFC-46BD-BA12-8B1AEB8865FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{925BD92A-0EFC-46BD-BA12-8B1AEB8865FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2CE9E005-4151-4567-B2CA-B24F46E3B715}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2CE9E005-4151-4567-B2CA-B24F46E3B715}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2CE9E005-4151-4567-B2CA-B24F46E3B715}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2CE9E005-4151-4567-B2CA-B24F46E3B715}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
