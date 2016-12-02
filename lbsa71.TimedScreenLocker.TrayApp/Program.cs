@@ -11,12 +11,13 @@
         [STAThread]
         private static void Main()
         {
-            notificationApp.Log(DateTime.Now + ": Starting up TrayApp.");
-
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
             var notificationApp = new TrayEngine();
+
+            notificationApp.Log(DateTime.Now + ": Starting up TrayApp.");
+
             notificationApp.Start();
 
             Application.Run();

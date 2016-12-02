@@ -28,3 +28,4 @@ lbsa71.TimedScreenLocker.Test/tester/ConsoleApplication1.vshost.exe
 lbsa71.TimedScreenLocker.Test/tester/ConsoleApplication1.vshost.exe.config
 lbsa71.TimedScreenLocker.Test/tester/ConsoleApplication1.vshost.exe.manifest
 lbsa71.TimedScreenLocker.TrayApp/obj/
+notifier/$RANDOM_SEED$
