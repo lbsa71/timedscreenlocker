@@ -24,9 +24,7 @@
 
         public void Log(string message)
         {
-            var currentDomainBaseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-
-            var logFile = currentDomainBaseDirectory + AppDomain.CurrentDomain.FriendlyName + ".log";
+            var logFile = this.baseDirectory + AppDomain.CurrentDomain.FriendlyName + ".log";
 
             using (var fs = new FileStream(logFile, FileMode.Append))
             {

@@ -3,6 +3,7 @@
     using System;
     using System.Configuration;
     using System.Drawing;
+    using System.IO;
     using System.Runtime.InteropServices;
     using System.Timers;
     using System.Windows.Forms;
@@ -13,9 +14,9 @@
 
     public abstract class CoreEngine : TimedAppLauncher
     {
-        protected Timer screenCheckTimer;
-
         public bool ScreenSaverRunning;
+
+        protected Timer screenCheckTimer;
 
         private readonly NotifyIcon notifyIcon1;
 
@@ -62,8 +63,7 @@
 
             this.pollingInterval = int.Parse(ConfigurationManager.AppSettings["pollingInterval"]);
 
-            this.secondsLeftOff = this.secondsOff;
-            this.secondsLeftOn = this.secondsOn;
+            this.LoadTime();
 
             this.screenCheckTimer = new Timer(this.pollingInterval * 1000);
             this.screenCheckTimer.Elapsed += this.Check;
@@ -75,10 +75,18 @@
 
         public abstract bool CheckOn { get; }
 
+        private string TimeFile
+        {
+            get
+            {
+                return this.baseDirectory + AppDomain.CurrentDomain.FriendlyName + ".time";
+            }
+        }
+
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         public static extern int SystemParametersInfo(int uAction, int uParam, ref int lpvParam, int fuWinIni);
 
-        override public void Start()
+        public override void Start()
         {
             this.Log("Timer Start");
             this.screenCheckTimer.Start();
@@ -86,7 +94,7 @@
             base.Start();
         }
 
-        override public void Stop()
+        public override void Stop()
         {
             this.Log("Timer Stop");
             this.screenCheckTimer.Stop();
@@ -161,6 +169,8 @@
             {
                 this.SwitchOff();
             }
+
+            this.SaveTime();
         }
 
         private void DeductTimeOff(double secondssince)
@@ -173,6 +183,61 @@
             {
                 this.secondsLeftOff = 0;
                 this.secondsLeftOn = this.secondsOn;
+            }
+        }
+
+        private void LoadTime()
+        {
+            var logFile = this.TimeFile;
+
+            using (var fs = new FileStream(logFile, FileMode.OpenOrCreate))
+            {
+                using (var logStream = new StreamReader(fs))
+                {
+                    var secondsLeftOnString = logStream.ReadLine();
+
+                    if (string.IsNullOrWhiteSpace(secondsLeftOnString))
+                    {
+                        this.secondsLeftOn = this.secondsOn;
+                    }
+                    else
+                    {
+                        this.secondsLeftOn = double.Parse(secondsLeftOnString);
+                    }
+
+                    var secondsLeftOffString = logStream.ReadLine();
+
+                    if (string.IsNullOrWhiteSpace(secondsLeftOffString))
+                    {
+                        this.secondsLeftOff = this.secondsOff;
+                    }
+                    else
+                    {
+                        this.secondsLeftOff = double.Parse(secondsLeftOffString);
+                    }
+
+                    logStream.Close();
+                }
+
+                fs.Close();
+            }
+        }
+
+        private void SaveTime()
+        {
+            var logFile = this.TimeFile;
+
+            using (var fs = new FileStream(logFile, FileMode.Create))
+            {
+                using (var logStream = new StreamWriter(fs) { AutoFlush = false })
+                {
+                    logStream.WriteLine(this.secondsLeftOn);
+                    logStream.WriteLine(this.secondsLeftOff);
+                    logStream.Flush();
+                    logStream.Close();
+                }
+
+                fs.Close();
             }
         }
 
