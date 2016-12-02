@@ -11,6 +11,8 @@
         [STAThread]
         private static void Main()
         {
+            notificationApp.Log(DateTime.Now + ": Starting up TrayApp.");
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
@@ -20,6 +22,8 @@
             Application.Run();
 
             notificationApp.Stop();
+
+            notificationApp.Log(DateTime.Now + ": Exiting app.");
         }
     }
 }

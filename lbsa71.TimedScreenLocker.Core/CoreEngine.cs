@@ -143,26 +143,30 @@
 
             this.Log(now + ": Time since last check:" + secondssince);
 
-            if (this.CheckOn && (this.secondsLeftOn > 0))
+            if (secondssince > (this.pollingInterval * 4))
             {
-                this.secondsLeftOn -= secondssince;
+                this.Log("Lost conciousness for " + secondssince + " seconds.");
 
-                if (this.secondsLeftOn <= 0)
-                {
-                    this.secondsLeftOn = 0;
-                    this.secondsLeftOff = this.secondsOff;
-                }
+                // For some reason, we have been unconcious for a while; treat this as being off.
+                DeductTimeOff(secondssince);
             }
             else
             {
-                if (!this.CheckOn && (this.secondsLeftOff > 0))
+                if (this.CheckOn && (this.secondsLeftOn > 0))
                 {
-                    this.secondsLeftOff -= secondssince;
+                    this.secondsLeftOn -= secondssince;
 
-                    if (this.secondsLeftOff <= 0)
+                    if (this.secondsLeftOn <= 0)
                     {
-                        this.secondsLeftOff = 0;
-                        this.secondsLeftOn = this.secondsOn;
+                        this.secondsLeftOn = 0;
+                        this.secondsLeftOff = this.secondsOff;
+                    }
+                }
+                else
+                {
+                    if (!this.CheckOn)
+                    {
+                        DeductTimeOff(secondssince);
                     }
                 }
             }
@@ -176,12 +180,29 @@
             if (this.secondsLeftOn <= 0) this.SwitchOff();
         }
 
+        private void DeductTimeOff(double secondssince)
+        {
+            this.secondsLeftOff -= secondssince;
+
+            if (this.secondsLeftOff <= 0)
+            {
+                this.secondsLeftOff = 0;
+                this.secondsLeftOn = this.secondsOn;
+            }
+        }
+
         private void SystemEvents_SessionSwitch(object sender, SessionSwitchEventArgs e)
         {
             this.Log("SystemEvents_SessionSwitch:" + e.Reason);
 
-            if (e.Reason == SessionSwitchReason.SessionLock) this.ScreenSaverRunning = true;
-            else if (e.Reason == SessionSwitchReason.SessionUnlock) this.ScreenSaverRunning = false;
+            if (e.Reason == SessionSwitchReason.SessionLock)
+            {
+                this.ScreenSaverRunning = true;                
+            }
+            else if (e.Reason == SessionSwitchReason.SessionUnlock)
+            {
+                this.ScreenSaverRunning = false;
+            }
         }
 
         private string tillminut(double seconds)
