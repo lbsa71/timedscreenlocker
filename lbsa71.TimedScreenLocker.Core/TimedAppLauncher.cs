@@ -2,40 +2,66 @@
 {
     using System;
     using System.Diagnostics;
+    using System.Drawing;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Timers;
+    using System.Windows.Forms;
+
+    using Timer = System.Timers.Timer;
 
     public abstract class TimedAppLauncher
     {
+        private const long ticksInAYear = TimeSpan.TicksPerSecond * 60 * 60 * 24 *365;
+
+        private long logInstance = DateTime.Now.Ticks % ticksInAYear;
+
+        protected NotifyIcon NotifyIcon;
+        protected abstract Icon AppIcon { get; }
+
         protected string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
         private Timer appCheckTimer;
 
         protected TimedAppLauncher()
-        {
-            this.Log(this.baseDirectory);
-
+        {          
             this.appCheckTimer = new Timer(3000);
-            this.appCheckTimer.Elapsed += this.CheckApp;
+
+            // this.appCheckTimer.Elapsed += this.CheckApp;
         }
 
-        protected abstract string otherProcessExeFileName { get; }
+        protected abstract string OtherProcessExeFileName { get; }
 
         public void Log(string message)
         {
-            var logFile = this.baseDirectory + AppDomain.CurrentDomain.FriendlyName + ".log";
+            bool done = false;
 
-            using (var fs = new FileStream(logFile, FileMode.Append))
+            while (!done)
             {
-                using (var logStream = new StreamWriter(fs) { AutoFlush = false })
+                var logFile = this.baseDirectory + AppDomain.CurrentDomain.FriendlyName + "." + this.logInstance
+                              + ".log";
+
+                try
                 {
-                    logStream.WriteLine(message);
-                    logStream.Flush();
-                    logStream.Close();
+                    using (var fs = new FileStream(logFile, FileMode.Append))
+                    {
+                        using (var logStream = new StreamWriter(fs) { AutoFlush = false })
+                        {
+                            logStream.WriteLine(DateTime.Now + ": " + message);
+                            logStream.Flush();
+                            logStream.Close();
+                        }
+
+                        fs.Close();
+                        done = true;
+                    }
+                }
+                catch (Exception)
+                {
+                    this.logInstance ++;
                 }
 
-                fs.Close();
             }
 
             Console.WriteLine(message);
@@ -43,6 +69,13 @@
 
         public virtual void Start()
         {
+            this.NotifyIcon = new NotifyIcon
+            {
+                Icon = this.AppIcon,
+                Text = "...",
+                Visible = true
+            };
+
             this.Log("AppTimer Start");
             this.appCheckTimer.Start();
         }
@@ -51,11 +84,15 @@
         {
             this.Log("AppTimer Stop");
             this.appCheckTimer.Stop();
+
+            this.NotifyIcon.Visible = false;
+            this.NotifyIcon.Dispose();
+            this.NotifyIcon = null;
         }
 
         private void CheckApp(object sender, ElapsedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(this.otherProcessExeFileName))
+            if (string.IsNullOrWhiteSpace(this.OtherProcessExeFileName))
             {
                 return;
             }
@@ -68,7 +105,7 @@
                         try
                         {
                             var fileName = Path.GetFileName(_.MainModule.FileName);
-                            if (fileName == this.otherProcessExeFileName)
+                            if (fileName == this.OtherProcessExeFileName)
                             {
                                 return true;
                             }
@@ -83,15 +120,29 @@
                         }
                     }))
             {
-                this.Log("Found " + this.otherProcessExeFileName);
+                this.Log("Found " + this.OtherProcessExeFileName);
             }
             else
             {
-                this.Log("Did not find " + this.otherProcessExeFileName);
+                this.Log("Did not find " + this.OtherProcessExeFileName);
 
-                var otherAppExe = this.baseDirectory + this.otherProcessExeFileName;
+                var otherAppExe = this.baseDirectory + this.OtherProcessExeFileName;
 
                 Process.Start(otherAppExe);
+            }
+        }
+
+        protected virtual void SetText(string text)
+        {            
+            var notifyIcon = this.NotifyIcon;
+            if (notifyIcon != null)
+            {
+                this.Log("SetText: " + text);
+                notifyIcon.Text = text;
+            }
+            else
+            {
+                this.Log("Failed to SetText: " + text);
             }
         }
     }

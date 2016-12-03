@@ -15,16 +15,19 @@
             Application.SetCompatibleTextRenderingDefault(false);
 
             var notificationApp = new TrayEngine();
-
-            notificationApp.Log(DateTime.Now + ": Starting up TrayApp.");
-
             notificationApp.Start();
 
-            Application.Run();
+            try
+            {
+                Application.Run();
+            }
+            catch (Exception e)
+            {
+                
+                notificationApp.Log("Main Exception: " + e.Message);
+            }
 
             notificationApp.Stop();
-
-            notificationApp.Log(DateTime.Now + ": Exiting app.");
         }
     }
 }

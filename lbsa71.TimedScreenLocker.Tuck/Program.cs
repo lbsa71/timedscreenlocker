@@ -14,12 +14,20 @@ namespace lbsa71.TimedScreenLocker.Tuck
         [STAThread]
         static void Main()
         {
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
             var tuck = new TuckEngine();
             tuck.Start();
 
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run();
+            try
+            {
+                Application.Run();
+            }
+            catch (Exception e)
+            {
+                tuck.Log("Main Exception: " + e.Message);
+            }
 
             tuck.Stop();
         }

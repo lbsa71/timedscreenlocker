@@ -1,5 +1,8 @@
 ﻿namespace lbsa71.TimedScreenLocker.Test
 {
+    using System;
+    using System.Drawing;
+
     using lbsa71.TimedScreenLocker.Core;
 
     internal class TestEngine : CoreEngine
@@ -16,7 +19,9 @@
             }
         }
 
-        protected override string otherProcessExeFileName => null;
+        protected override Icon AppIcon => Resource.appIcon;
+
+        protected override string OtherProcessExeFileName => null;
 
         protected override void SetText(string text)
         {
