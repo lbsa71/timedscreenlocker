@@ -22,8 +22,7 @@
                 Application.Run();
             }
             catch (Exception e)
-            {
-                
+            {                
                 notificationApp.Log("Main Exception: " + e.Message);
             }
 

@@ -17,3 +17,5 @@ lbsa71.TimedScreenLocker.Tuck/obj/
 notifier/Tuck.vshost.exe
 notifier/Tuck.vshost.exe.config
 notifier/Tuck.vshost.exe.manifest
+notifier/TrayApp.vshost.exe.config
+notifier/TrayApp.vshost.exe.time

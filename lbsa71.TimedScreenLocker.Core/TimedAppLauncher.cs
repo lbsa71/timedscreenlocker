@@ -26,9 +26,9 @@
 
         protected TimedAppLauncher()
         {          
-            this.appCheckTimer = new Timer(3000);
+            this.appCheckTimer = new Timer(10000);
 
-            // this.appCheckTimer.Elapsed += this.CheckApp;
+            this.appCheckTimer.Elapsed += this.CheckApp;
         }
 
         protected abstract string OtherProcessExeFileName { get; }
@@ -61,7 +61,6 @@
                 {
                     this.logInstance ++;
                 }
-
             }
 
             Console.WriteLine(message);
@@ -72,7 +71,7 @@
             this.NotifyIcon = new NotifyIcon
             {
                 Icon = this.AppIcon,
-                Text = "...",
+                Text = "...Gäsp...",
                 Visible = true
             };
 
@@ -92,6 +91,15 @@
 
         private void CheckApp(object sender, ElapsedEventArgs e)
         {
+            var rescueText = AppDomain.CurrentDomain.FriendlyName + " till räddning!";
+
+            var killfile = this.baseDirectory + "killme";
+
+            if (File.Exists(killfile) || Directory.Exists(killfile))
+            {
+                Application.Exit();
+            }
+
             if (string.IsNullOrWhiteSpace(this.OtherProcessExeFileName))
             {
                 return;
@@ -121,6 +129,11 @@
                     }))
             {
                 this.Log("Found " + this.OtherProcessExeFileName);
+
+                if (this.GetText() == rescueText)
+                {
+                    SetText("Zzzz...");
+                }
             }
             else
             {
@@ -129,7 +142,14 @@
                 var otherAppExe = this.baseDirectory + this.OtherProcessExeFileName;
 
                 Process.Start(otherAppExe);
+
+                SetText(rescueText);
             }
+        }
+
+        private string GetText()
+        {
+            return this.NotifyIcon?.Text ?? "???";
         }
 
         protected virtual void SetText(string text)
