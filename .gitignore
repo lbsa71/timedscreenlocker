@@ -19,3 +19,5 @@ notifier/Tuck.vshost.exe.config
 notifier/Tuck.vshost.exe.manifest
 notifier/TrayApp.vshost.exe.config
 notifier/TrayApp.vshost.exe.time
+lbsa71.TimedScreenLocker.TrayApp/lbsa71.TimedScreenLocker.TrayApp.csproj.user
+lbsa71.TimedScreenLocker.Tuck/lbsa71.TimedScreenLocker.Tuck.csproj.user

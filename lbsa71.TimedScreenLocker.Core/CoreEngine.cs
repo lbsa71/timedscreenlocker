@@ -103,20 +103,22 @@
             }
             else
             {
-                if (checkOn && (this.secondsLeftOn > 0))
+                if (checkOn)
                 {
-                    this.Log("Screen on; deducting " + secondssince + " seconds from screen on.");
-
-                    this.secondsLeftOn -= secondssince;
-
-                    if (this.secondsLeftOn <= 0)
+                    if (this.secondsLeftOn > 0)
                     {
-                        this.secondsLeftOn = 0;
-                        this.secondsLeftOff = this.secondsOff;
+                        this.Log("Screen on; deducting " + secondssince + " seconds from screen on.");
+
+                        this.secondsLeftOn -= secondssince;
+
+                        if (this.secondsLeftOn <= 0)
+                        {
+                            this.secondsLeftOn = 0;
+                            this.secondsLeftOff = this.secondsOff;
+                        }
                     }
                 }
-
-                if (!checkOn)
+                else
                 {
                     this.DeductTimeOff(secondssince);
                 }
@@ -167,8 +169,7 @@
 
                             if (string.IsNullOrWhiteSpace(secondsLeftOnString))
                             {
-                                this.secondsLeftOn = 0;
-                                this.secondsLeftOff = this.secondsOff;
+                                this.secondsLeftOn = 0;                              
                             }
                             else
                             {
