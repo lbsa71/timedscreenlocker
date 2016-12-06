@@ -89,26 +89,28 @@
             this.NotifyIcon = null;
         }
 
-        private void CheckApp(object sender, ElapsedEventArgs e)
+        private void CheckApp(object sender, ElapsedEventArgs eventArgs)
         {
-            var rescueText = AppDomain.CurrentDomain.FriendlyName + " till räddning!";
-
-            var killfile = this.baseDirectory + "killme";
-
-            if (File.Exists(killfile) || Directory.Exists(killfile))
+            try
             {
-                Application.Exit();
-            }
+                var rescueText = AppDomain.CurrentDomain.FriendlyName + " till räddning!";
 
-            if (string.IsNullOrWhiteSpace(this.OtherProcessExeFileName))
-            {
-                return;
-            }
+                var killfile = this.baseDirectory + "killme2";
 
-            var otherProcesses = Process.GetProcesses();
+                if (File.Exists(killfile) || Directory.Exists(killfile))
+                {
+                    Application.Exit();
+                }
 
-            if (otherProcesses.Any(
-                _ =>
+                if (string.IsNullOrWhiteSpace(this.OtherProcessExeFileName))
+                {
+                    return;
+                }
+
+                var otherProcesses = Process.GetProcesses();
+
+                if (otherProcesses.Any(
+                    _ =>
                     {
                         try
                         {
@@ -127,24 +129,29 @@
                             return false;
                         }
                     }))
-            {
-                this.Log("Found " + this.OtherProcessExeFileName);
-
-                if (this.GetText() == rescueText)
                 {
-                    SetText("Zzzz...");
+                    this.Log("Found " + this.OtherProcessExeFileName);
+
+                    if (this.GetText() == rescueText)
+                    {
+                        SetText("Zzzz...");
+                    }
+                }
+                else
+                {
+                    this.Log("Did not find " + this.OtherProcessExeFileName);
+
+                    var otherAppExe = this.baseDirectory + this.OtherProcessExeFileName;
+
+                    Process.Start(otherAppExe);
+
+                    SetText(rescueText);
                 }
             }
-            else
+            catch (Exception e)
             {
-                this.Log("Did not find " + this.OtherProcessExeFileName);
-
-                var otherAppExe = this.baseDirectory + this.OtherProcessExeFileName;
-
-                Process.Start(otherAppExe);
-
-                SetText(rescueText);
-            }
+                this.Log("CheckApp: " + e.Message);                
+            }                      
         }
 
         private string GetText()

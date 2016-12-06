@@ -83,59 +83,66 @@
         [DllImport("wtsapi32.dll")]
         private static extern bool WTSUnRegisterSessionNotification(IntPtr hWnd);
 
-        private void Check(object sender, ElapsedEventArgs e)
+        private void Check(object sender, ElapsedEventArgs eventArgs)
         {
-            var now = DateTime.Now;
-
-            var secondssince = (now - this.lastChecked).TotalSeconds;
-            this.lastChecked = now;
-
-            this.Log(now + ": Time since last check:" + secondssince);
-
-            var checkOn = this.CheckOn;
-
-            if (secondssince > (this.pollingInterval * 4))
+            try
             {
-                this.Log("Lost conciousness for " + secondssince + " seconds.");
+                var now = DateTime.Now;
 
-                // For some reason, we have been unconcious for a while; treat this as being off.
-                this.DeductTimeOff(secondssince);
-            }
-            else
-            {
-                if (checkOn)
+                var secondssince = (now - this.lastChecked).TotalSeconds;
+                this.lastChecked = now;
+
+                this.Log(now + ": Time since last check:" + secondssince);
+
+                var checkOn = this.CheckOn;
+
+                if (secondssince > (this.pollingInterval * 4))
                 {
-                    if (this.secondsLeftOn > 0)
-                    {
-                        this.Log("Screen on; deducting " + secondssince + " seconds from screen on.");
+                    this.Log("Lost conciousness for " + secondssince + " seconds.");
 
-                        this.secondsLeftOn -= secondssince;
-
-                        if (this.secondsLeftOn <= 0)
-                        {
-                            this.secondsLeftOn = 0;
-                            this.secondsLeftOff = this.secondsOff;
-                        }
-                    }
+                    // For some reason, we have been unconcious for a while; treat this as being off.
+                    this.DeductTimeOff(secondssince);
                 }
                 else
                 {
-                    this.DeductTimeOff(secondssince);
+                    if (checkOn)
+                    {
+                        if (this.secondsLeftOn > 0)
+                        {
+                            this.Log("Screen on; deducting " + secondssince + " seconds from screen on.");
+
+                            this.secondsLeftOn -= secondssince;
+
+                            if (this.secondsLeftOn <= 0)
+                            {
+                                this.secondsLeftOn = 0;
+                                this.secondsLeftOff = this.secondsOff;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        this.DeductTimeOff(secondssince);
+                    }
                 }
+
+                var message = this.secondsLeftOn > 0
+                                  ? "Tid tills datorn låser:" + this.tillminut(this.secondsLeftOn)
+                                  : "Tid tills datorn är öppen igen:" + this.tillminut(this.secondsLeftOff);
+
+                this.SetText(message);
+
+                if (this.secondsLeftOn <= 0)
+                {
+                    this.SwitchOff();
+                }
+
+                this.SaveTime();
             }
-
-            var message = this.secondsLeftOn > 0
-                              ? "Tid tills datorn låser:" + this.tillminut(this.secondsLeftOn)
-                              : "Tid tills datorn är öppen igen:" + this.tillminut(this.secondsLeftOff);
-
-            this.SetText(message);
-
-            if (this.secondsLeftOn <= 0)
+            catch (Exception e)
             {
-                this.SwitchOff();
+                Log("CoreEngine Check: " + e.Message);
             }
-
-            this.SaveTime();
         }
 
         private void DeductTimeOff(double secondssince)
@@ -169,22 +176,23 @@
 
                             if (string.IsNullOrWhiteSpace(secondsLeftOnString))
                             {
-                                this.secondsLeftOn = 0;                              
-                            }
-                            else
-                            {
-                                this.secondsLeftOn = double.Parse(secondsLeftOnString);
-                            }
-
-                            var secondsLeftOffString = logStream.ReadLine();
-
-                            if (string.IsNullOrWhiteSpace(secondsLeftOffString))
-                            {
+                                this.secondsLeftOn = this.secondsOn;
                                 this.secondsLeftOff = this.secondsOff;
                             }
                             else
                             {
-                                this.secondsLeftOff = double.Parse(secondsLeftOffString);
+                                this.secondsLeftOn = double.Parse(secondsLeftOnString);
+
+                                var secondsLeftOffString = logStream.ReadLine();
+
+                                if (string.IsNullOrWhiteSpace(secondsLeftOffString))
+                                {
+                                    this.secondsLeftOff = this.secondsOff;
+                                }
+                                else
+                                {
+                                    this.secondsLeftOff = double.Parse(secondsLeftOffString);
+                                }
                             }
 
                             logStream.Close();
@@ -224,6 +232,7 @@
                             logStream.WriteLine(this.secondsLeftOn);
                             logStream.WriteLine(this.secondsLeftOff);
                             logStream.Flush();
+
                             logStream.Close();
                         }
 
