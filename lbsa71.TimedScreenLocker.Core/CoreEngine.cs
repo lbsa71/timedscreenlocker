@@ -26,7 +26,7 @@
 
         private double secondsLeftOn;
 
-        private string TimeFile;
+        private readonly string timeFile;
 
         protected CoreEngine()
         {
@@ -39,16 +39,19 @@
 
             this.pollingInterval = int.Parse(ConfigurationManager.AppSettings["pollingInterval"] ?? "20");
 
-            this.TimeFile = this.baseDirectory + AppDomain.CurrentDomain.FriendlyName + ".time";
+            this.timeFile = this.baseDirectory + AppDomain.CurrentDomain.FriendlyName + ".time";
 
             this.LoadTime();
+
+            
+            this.Log(
+                "System initialized: lastChecked:" + this.lastChecked + " secondsOff:" + this.secondsOff + " secondsOn:" + this.secondsOn
+                + " pollingInterval:" + this.pollingInterval);
 
             this.screenCheckTimer = new Timer(this.pollingInterval * 1000);
             this.screenCheckTimer.Elapsed += this.Check;
 
-            this.Log(
-                "System initialized: secondsOff:" + this.secondsOff + " secondsOn:" + this.secondsOn
-                + " pollingInterval:" + this.pollingInterval);
+            this.Check(null, null);
         }
 
         public abstract bool CheckOn { get; }
@@ -162,92 +165,81 @@
         {
             this.Log("LoadTime");
 
-            var timeFile = this.TimeFile;
+            var timeFile = this.timeFile;
 
-            if (timeFile != null)
+            this.lastChecked = DateTime.Now;
+            this.secondsLeftOn = this.secondsOn;
+            this.secondsLeftOff = this.secondsOff;
+
+            try
             {
-                try
+                using (var fs = new FileStream(timeFile, FileMode.OpenOrCreate))
                 {
-                    using (var fs = new FileStream(timeFile, FileMode.OpenOrCreate))
+                    using (var logStream = new StreamReader(fs))
                     {
-                        using (var logStream = new StreamReader(fs))
+                        var lastCheckedString = logStream.ReadLine();
+
+                        if (!string.IsNullOrWhiteSpace(lastCheckedString))
                         {
+                            this.lastChecked = DateTime.Parse(lastCheckedString);
+
                             var secondsLeftOnString = logStream.ReadLine();
 
-                            if (string.IsNullOrWhiteSpace(secondsLeftOnString))
-                            {
-                                this.secondsLeftOn = this.secondsOn;
-                                this.secondsLeftOff = this.secondsOff;
-                            }
-                            else
+                            if (!string.IsNullOrWhiteSpace(secondsLeftOnString))
                             {
                                 this.secondsLeftOn = double.Parse(secondsLeftOnString);
 
                                 var secondsLeftOffString = logStream.ReadLine();
 
-                                if (string.IsNullOrWhiteSpace(secondsLeftOffString))
-                                {
-                                    this.secondsLeftOff = this.secondsOff;
-                                }
-                                else
+                                if (!string.IsNullOrWhiteSpace(secondsLeftOffString))
                                 {
                                     this.secondsLeftOff = double.Parse(secondsLeftOffString);
                                 }
                             }
-
-                            logStream.Close();
                         }
 
-                        fs.Close();
+                        logStream.Close();
                     }
-                }
-                catch (Exception e)
-                {
-                    this.Log(e.Message);
 
-                    this.secondsLeftOn = 0;
-                    this.secondsLeftOff = this.secondsOff;
-
-                    this.Log("Disabling Time File");
-
-                    this.TimeFile = null;
+                    fs.Close();
                 }
             }
+            catch (Exception e)
+            {
+                this.Log("Couldn't read Time file" + e.Message);
+            }
+
         }
 
         private void SaveTime()
         {
             this.Log("SaveTime:" + this.secondsLeftOn + ", " + this.secondsLeftOff);
 
-            var timeFile = this.TimeFile;
+            var timeFile = this.timeFile;
 
-            if (timeFile != null)
+            try
             {
-                try
+                using (var fs = new FileStream(timeFile, FileMode.Create))
                 {
-                    using (var fs = new FileStream(timeFile, FileMode.Create))
+                    using (var logStream = new StreamWriter(fs) { AutoFlush = false })
                     {
-                        using (var logStream = new StreamWriter(fs) { AutoFlush = false })
-                        {
-                            logStream.WriteLine(this.secondsLeftOn);
-                            logStream.WriteLine(this.secondsLeftOff);
-                            logStream.Flush();
+                        logStream.WriteLine(this.lastChecked);
+                        logStream.WriteLine(this.secondsLeftOn);
+                        logStream.WriteLine(this.secondsLeftOff);
+                        logStream.Flush();
 
-                            logStream.Close();
-                        }
-
-                        fs.Close();
+                        logStream.Close();
                     }
-                }
-                catch (Exception e)
-                {
-                    // -- something seems to be problematic with the file system. Disable time storing.
-                    this.Log(e.Message);
 
-                    this.Log("Disabling Time File");
-                    this.TimeFile = null;
+                    fs.Close();
                 }
             }
+            catch (Exception e)
+            {
+                // -- something seems to be problematic with the file system. Disable time storing.
+                this.Log("Could not save time file:" + e.Message);
+            }
+
         }
 
         private void SystemEvents_SessionSwitch(object sender, SessionSwitchEventArgs e)

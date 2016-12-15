@@ -29,6 +29,8 @@
             this.appCheckTimer = new Timer(10000);
 
             this.appCheckTimer.Elapsed += this.CheckApp;
+
+            this.CheckApp(null, null);
         }
 
         protected abstract string OtherProcessExeFileName { get; }
