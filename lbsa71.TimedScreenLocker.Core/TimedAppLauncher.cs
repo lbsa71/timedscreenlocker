@@ -5,7 +5,6 @@
     using System.Drawing;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
     using System.Timers;
     using System.Windows.Forms;
 
@@ -13,25 +12,26 @@
 
     public abstract class TimedAppLauncher
     {
-        private const long ticksInAYear = TimeSpan.TicksPerSecond * 60 * 60 * 24 *365;
-
-        private long logInstance = DateTime.Now.Ticks % ticksInAYear;
-
-        protected NotifyIcon NotifyIcon;
-        protected abstract Icon AppIcon { get; }
+        private const long ticksInAYear = TimeSpan.TicksPerSecond * 60 * 60 * 24 * 365;
 
         protected string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
 
+        protected NotifyIcon NotifyIcon;
+
         private Timer appCheckTimer;
 
+        private long logInstance = DateTime.Now.Ticks % ticksInAYear;
+
         protected TimedAppLauncher()
-        {          
+        {
             this.appCheckTimer = new Timer(10000);
 
             this.appCheckTimer.Elapsed += this.CheckApp;
 
             this.CheckApp(null, null);
         }
+
+        protected abstract Icon AppIcon { get; }
 
         protected abstract string OtherProcessExeFileName { get; }
 
@@ -61,7 +61,7 @@
                 }
                 catch (Exception)
                 {
-                    this.logInstance ++;
+                    this.logInstance++;
                 }
             }
 
@@ -70,12 +70,7 @@
 
         public virtual void Start()
         {
-            this.NotifyIcon = new NotifyIcon
-            {
-                Icon = this.AppIcon,
-                Text = "...Gäsp...",
-                Visible = true
-            };
+            this.NotifyIcon = new NotifyIcon { Icon = this.AppIcon, Text = "...Gäsp...", Visible = true };
 
             this.Log("AppTimer Start");
             this.appCheckTimer.Start();
@@ -91,13 +86,27 @@
             this.NotifyIcon = null;
         }
 
+        protected virtual void SetText(string text)
+        {
+            var notifyIcon = this.NotifyIcon;
+            if (notifyIcon != null)
+            {
+                this.Log("SetText: " + text);
+                notifyIcon.Text = text;
+            }
+            else
+            {
+                this.Log("Failed to SetText: " + text);
+            }
+        }
+
         private void CheckApp(object sender, ElapsedEventArgs eventArgs)
         {
             try
             {
                 var rescueText = AppDomain.CurrentDomain.FriendlyName + " till räddning!";
 
-                var killfile = this.baseDirectory + "killme2";
+                var killfile = this.baseDirectory + "kill_me_";
 
                 if (File.Exists(killfile) || Directory.Exists(killfile))
                 {
@@ -109,34 +118,15 @@
                     return;
                 }
 
-                var otherProcesses = Process.GetProcesses();
+                var availableProcesses = GetAvailableProcesses();
 
-                if (otherProcesses.Any(
-                    _ =>
-                    {
-                        try
-                        {
-                            var fileName = Path.GetFileName(_.MainModule.FileName);
-                            if (fileName == this.OtherProcessExeFileName)
-                            {
-                                return true;
-                            }
-                            else
-                            {
-                                return false;
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            return false;
-                        }
-                    }))
+                if (availableProcesses.Any(this.IsOtherProcess))
                 {
                     this.Log("Found " + this.OtherProcessExeFileName);
 
                     if (this.GetText() == rescueText)
                     {
-                        SetText("Zzzz...");
+                        this.SetText("Zzzz...");
                     }
                 }
                 else
@@ -145,15 +135,52 @@
 
                     var otherAppExe = this.baseDirectory + this.OtherProcessExeFileName;
 
+                    this.Log("Starting  " + otherAppExe);
+
                     Process.Start(otherAppExe);
 
-                    SetText(rescueText);
+                    this.SetText(rescueText);
                 }
             }
             catch (Exception e)
             {
-                this.Log("CheckApp: " + e.Message);                
-            }                      
+                this.Log("CheckApp: " + e.Message);
+            }
+        }
+
+        private Process[] GetAvailableProcesses()
+        {
+            var currentProcess = Process.GetCurrentProcess();
+            var currentProcessFilename = currentProcess.MainModule.FileName;
+            var currentProcessId = currentProcess.Id;
+
+            var otherProcesses = Process.GetProcesses();
+
+            var availableprocesses = otherProcesses.Where(
+                _ =>
+                    {
+                        try
+                        {
+                            var filename = Path.GetFileName(_.MainModule.FileName);
+                            var id = _.Id;
+
+                            if ((filename == currentProcessFilename) && (id != currentProcessId))
+                            {
+                                this.Log("Found sibling: " + filename + "[" + id + "]");
+                                this.Log("I have: " + currentProcessFilename + "[" + currentProcessId + "]");
+                                this.Log("Exiting. ");
+
+                                Application.Exit();
+                            }
+
+                            return true;
+                        }
+                        catch (Exception)
+                        {
+                            return false;
+                        }
+                    }).ToArray();
+            return availableprocesses;
         }
 
         private string GetText()
@@ -161,18 +188,9 @@
             return this.NotifyIcon?.Text ?? "???";
         }
 
-        protected virtual void SetText(string text)
-        {            
-            var notifyIcon = this.NotifyIcon;
-            if (notifyIcon != null)
-            {
-                this.Log("SetText: " + text);
-                notifyIcon.Text = text;
-            }
-            else
-            {
-                this.Log("Failed to SetText: " + text);
-            }
+        private bool IsOtherProcess(Process unknown)
+        {
+            return Path.GetFileName(unknown.MainModule.FileName) == this.OtherProcessExeFileName;
         }
     }
 }
