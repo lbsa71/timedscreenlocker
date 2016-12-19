@@ -18,7 +18,11 @@
 
         protected NotifyIcon NotifyIcon;
 
-        private Timer appCheckTimer;
+        private readonly string datestring = DateTime.Now.ToString("yyyyMd");
+
+        private readonly string killFileName;
+
+        private readonly Timer appCheckTimer;
 
         private long logInstance = DateTime.Now.Ticks % ticksInAYear;
 
@@ -29,6 +33,9 @@
             this.appCheckTimer.Elapsed += this.CheckApp;
 
             this.CheckApp(null, null);
+
+            this.killFileName = this.baseDirectory + "kill_me_" + this.datestring;
+            this.Log("Killfile:[" + this.killFileName + "]");
         }
 
         protected abstract Icon AppIcon { get; }
@@ -106,10 +113,10 @@
             {
                 var rescueText = AppDomain.CurrentDomain.FriendlyName + " till räddning!";
 
-                var killfile = this.baseDirectory + "kill_me_";
-
-                if (File.Exists(killfile) || Directory.Exists(killfile))
+                if (File.Exists(this.killFileName) || Directory.Exists(this.killFileName))
                 {
+                    this.Log("Found killfile [" + this.killFileName + "]");
+
                     Application.Exit();
                 }
 
@@ -118,7 +125,7 @@
                     return;
                 }
 
-                var availableProcesses = GetAvailableProcesses();
+                var availableProcesses = this.GetAvailableProcesses();
 
                 if (availableProcesses.Any(this.IsOtherProcess))
                 {

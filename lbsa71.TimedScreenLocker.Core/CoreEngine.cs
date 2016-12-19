@@ -12,7 +12,7 @@
     {
         public bool ScreenSaverRunning;
 
-        protected Timer screenCheckTimer;
+        protected Timer ScreenCheckTimer;
 
         private readonly int pollingInterval;
 
@@ -20,13 +20,13 @@
 
         private readonly double secondsOn;
 
+        private readonly string timeFile;
+
         private DateTime lastChecked;
 
         private double secondsLeftOff;
 
         private double secondsLeftOn;
-
-        private readonly string timeFile;
 
         protected CoreEngine()
         {
@@ -43,13 +43,12 @@
 
             this.LoadTime();
 
-            
             this.Log(
-                "System initialized: lastChecked:" + this.lastChecked + " secondsOff:" + this.secondsOff + " secondsOn:" + this.secondsOn
-                + " pollingInterval:" + this.pollingInterval);
+                "System initialized: lastChecked:" + this.lastChecked + " secondsOff:" + this.secondsOff + " secondsOn:"
+                + this.secondsOn + " pollingInterval:" + this.pollingInterval);
 
-            this.screenCheckTimer = new Timer(this.pollingInterval * 1000);
-            this.screenCheckTimer.Elapsed += this.Check;
+            this.ScreenCheckTimer = new Timer(this.pollingInterval * 1000);
+            this.ScreenCheckTimer.Elapsed += this.Check;
 
             this.Check(null, null);
         }
@@ -62,7 +61,7 @@
         public override void Start()
         {
             this.Log("Timer Start");
-            this.screenCheckTimer.Start();
+            this.ScreenCheckTimer.Start();
 
             base.Start();
         }
@@ -70,7 +69,7 @@
         public override void Stop()
         {
             this.Log("Timer Stop");
-            this.screenCheckTimer.Stop();
+            this.ScreenCheckTimer.Stop();
 
             base.Stop();
         }
@@ -144,7 +143,7 @@
             }
             catch (Exception e)
             {
-                Log("CoreEngine Check: " + e.Message);
+                this.Log("CoreEngine Check: " + e.Message);
             }
         }
 
@@ -175,30 +174,42 @@
             {
                 using (var fs = new FileStream(timeFile, FileMode.OpenOrCreate))
                 {
-                    using (var logStream = new StreamReader(fs))
+                    using (var timeStream = new StreamReader(fs))
                     {
-                        var lastCheckedString = logStream.ReadLine();
+                        var lastCheckedString = timeStream.ReadLine();
 
-                        if (!string.IsNullOrWhiteSpace(lastCheckedString))
+                        if (string.IsNullOrWhiteSpace(lastCheckedString))
+                        {
+                            this.Log("lastCheckedString empty");
+                        }
+                        else
                         {
                             this.lastChecked = DateTime.Parse(lastCheckedString);
 
-                            var secondsLeftOnString = logStream.ReadLine();
+                            var secondsLeftOnString = timeStream.ReadLine();
 
-                            if (!string.IsNullOrWhiteSpace(secondsLeftOnString))
+                            if (string.IsNullOrWhiteSpace(secondsLeftOnString))
+                            {
+                                this.Log("secondsLeftOnString empty");
+                            }
+                            else
                             {
                                 this.secondsLeftOn = double.Parse(secondsLeftOnString);
 
-                                var secondsLeftOffString = logStream.ReadLine();
+                                var secondsLeftOffString = timeStream.ReadLine();
 
-                                if (!string.IsNullOrWhiteSpace(secondsLeftOffString))
+                                if (string.IsNullOrWhiteSpace(secondsLeftOffString))
+                                {
+                                    this.Log("secondsLeftOffString empty");
+                                }
+                                else
                                 {
                                     this.secondsLeftOff = double.Parse(secondsLeftOffString);
                                 }
                             }
                         }
 
-                        logStream.Close();
+                        timeStream.Close();
                     }
 
                     fs.Close();
@@ -208,7 +219,6 @@
             {
                 this.Log("Couldn't read Time file" + e.Message);
             }
-
         }
 
         private void SaveTime()
@@ -239,7 +249,6 @@
                 // -- something seems to be problematic with the file system. Disable time storing.
                 this.Log("Could not save time file:" + e.Message);
             }
-
         }
 
         private void SystemEvents_SessionSwitch(object sender, SessionSwitchEventArgs e)
